@@ -1,68 +1,51 @@
-# ---------------------------------------------------------------------------- Install base system
-# -------------------------------------------------------------------------------------------------
-
-- name: KVM and QEMU System components 
-  apt: 
-    name: 
-      - qemu-kvm 
-      - libvirt-daemon-system 
-      - libvirt-clients 
+- name: Install KVM and QEMU System components
+  apt:
+    name:
+      - qemu-kvm
+      - libvirt-daemon-system
+      - libvirt-clients
       - python-libvirt
       - python-lxml
       - bridge-utils
       - cloud-image-utils
-      - virtinst  
-
-
-- name: Libvirtd systemd service
-  service: 
+      - virtinst
+- name: Enable Libvirtd service
+  service:
     name: libvirtd
-    enabled: true 
-    state: started 
-
-# ------------------------------------------------------------------------------ Manage cloud image
-# -------------------------------------------------------------------------------------------------
-
-- name: qemu images directory 
-  file: 
-    state: directory 
+    enabled: true
+    state: started
+- name: Create qemu images directory
+  file:
+    state: directory
     path: /virt/images
-
-- name: Check Ubuntu 18.04 cloud image
-  uri: 
-    url: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
+- name: Check Ubuntu 20.04 cloud image
+  uri:
+    url: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
     method: HEAD
   register: cloudimg_http_stat
-  check_mode: no 
-
-- name: Check local cloud image 
-  stat: 
-    path: /virt/images/bionic-server-cloudimg-amd64.img 
-    get_checksum: no 
-  register: cloudimg_local_stat 
-
-- name: Update Ubuntu 18.04 cloud image
+  check_mode: no
+- name: Check local cloud image
+  stat:
+    path: /virt/images/focal-server-cloudimg-amd64.img
+    get_checksum: no
+  register: cloudimg_local_stat
+- name: Update Ubuntu 20.04 cloud image
   get_url:
-    url: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
-    dest: /virt/images/bionic-server-cloudimg-amd64.img
-  when: not cloudimg_local_stat.stat.exists or 
+    url: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+    dest: /virt/images/focal-server-cloudimg-amd64.img
+  when: not cloudimg_local_stat.stat.exists or
         cloudimg_local_stat.stat.size != cloudimg_http_stat.content_length
-  register: cloudimg_local_updated 
-
-- name: Convert cloud image qcow format 
-  shell: 
+  register: cloudimg_local_updated
+- name: Convert cloud image qcow format
+  shell:
     chdir: /virt/images/
-    cmd: qemu-img convert -f qcow2 bionic-server-cloudimg-amd64.img bionic-server-cloudimg-amd64.qcow2
-    creates: /virt/images/bionic-server-cloudimg-amd64.qcow2
+    cmd: qemu-img convert -f qcow2 focal-server-cloudimg-amd64.img focal-server-cloudimg-amd64.qcow2
+    creates: /virt/images/focal-server-cloudimg-amd64.qcow2
   when: cloudimg_local_updated.changed|bool
-
-# ----------------------------------------------------------------------------------- VM Directory 
-# -------------------------------------------------------------------------------------------------
-
-- name: Virtual machine directory 
-  file: 
+- name: Create VM directory
+  file:
     path: /virt/vms
-    state: directory 
+    state: directory
     owner: root
     group: root
     mode: 0755
