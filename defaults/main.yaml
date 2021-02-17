@@ -4,14 +4,14 @@ users:
   passwd: $6$rounds=2048$MO3IMGH9c.E$KOWqIJkvcjMrye5HtUjVoMthnV/8f4it9Knt.EfY7taJRbksZ6g6IRPTYIczAZOBOzMfcVKbCTROP71ynZ9d4.
   pub_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJtLL5Oa3L8wtHy6S4jCehP3r4SjDQWHMf7FGvMhodfb
 virtual_machines:
-  - name: test
-    cpu: 1
-    mem: 512
+  - name: ubuntu
+    cpu: 2
+    mem: 1024
     disk: 5G
     bridge: br0
     net:
-      ip: 10.0.0.2/24
-      gateway: 10.0.0.1
+      ip: 192.168.100.2/24
+      gateway: 192.168.100.1
       domain: example.com
       dns:
         - 1.1.1.1

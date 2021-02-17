@@ -47,10 +47,10 @@
         --disk /virt/vms/{{ vm.name }}/{{ vm.name }}.qcow2,device=disk,bus=virtio
         --disk /virt/vms/{{ vm.name }}/cloud-config.img,device=cdrom
         --os-type linux
-        --os-variant ubuntu18.04
+        --os-variant ubuntu20.04
         --virt-type kvm
         --graphics none
-        --network bridge={{ vm.bridge|default('default') }},model=virtio
+        --network bridge={{ vm.bridge }},model=virtio
         --import
   when: vm_stat.stat.exists == false
 - name: "{{ vm.name }} - Start with host startup"
